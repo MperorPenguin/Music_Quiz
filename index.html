@@ -44,6 +44,7 @@ html,body{height:100%;margin:0;background:var(--bg);color:var(--ink);font-family
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:.6em;padding:.9em 1.2em;border-radius:12px;cursor:pointer;border:1px solid var(--btnLine);background:var(--btn);color:var(--ink);font-size:clamp(15px,1.9vh,18px)}
 .btn.primary{background:var(--accent);color:#07121e;border-color:#2a7ed6;font-weight:800}
 .btn.ghost{background:transparent}
+.btn.disabled{opacity:.5; pointer-events:none; filter:saturate(.6)}
 .small{color:var(--muted);font-size:clamp(12px,1.6vh,14px)}
 
 /* START screen */
@@ -131,7 +132,7 @@ audio{width:100%;height:100%;max-height:8vh;align-self:center}
       <div class="chip" id="scoreMini">Score: 0</div>
     </div>
 
-    <!-- START (YES, big visible Start button) -->
+    <!-- START -->
     <section class="screen active" id="screen-start">
       <div class="start-wrap">
         <div class="start-main">
@@ -183,7 +184,7 @@ audio{width:100%;height:100%;max-height:8vh;align-self:center}
       </div>
       <div class="nav">
         <button class="btn ghost" id="btnPrev">Back</button>
-        <button class="btn primary" id="btnNext">Next</button>
+        <button class="btn primary disabled" id="btnNext">Next</button>
       </div>
     </section>
 
@@ -219,7 +220,7 @@ audio{width:100%;height:100%;max-height:8vh;align-self:center}
 <script>
 /* ---------- Config ---------- */
 const ROUND_SIZES={ "Albums":12, "Intros":12, "Year Released":13, "Band Members":13 };
-const CLIP_LEN=18; // target ~18s (within 15–20s)
+const CLIP_LEN=18; // ~18s within 15–20
 
 const ARTISTS={
   "1980s":["Michael Jackson","Madonna","Prince","U2","Duran Duran","Whitney Houston","The Smiths","Depeche Mode","A-ha","Eurythmics","The Cure","Bon Jovi","Guns N' Roses","New Order","George Michael"],
@@ -307,6 +308,18 @@ let QUESTIONS=[],idx=0,score=0;
 let perRound={"Albums":0,"Intros":0,"Year Released":0,"Band Members":0};
 let answers=[];
 let clipTimer=null;
+let answered=false;         // NEW: has the user answered the current question?
+let autoNextTimer=null;     // NEW: timer for auto-advance
+
+/* ---------- Utility ---------- */
+function enableNext(on){
+  const btn=$("#btnNext");
+  if(on){ btn.classList.remove("disabled"); btn.disabled=false; }
+  else { btn.classList.add("disabled"); btn.disabled=true; }
+}
+function clearAutoNext(){
+  if(autoNextTimer){ clearTimeout(autoNextTimer); autoNextTimer=null; }
+}
 
 /* ---------- Rendering ---------- */
 function setArt(url,cap){const img=$("#artImg"); if(url){img.src=url;img.alt=cap||"Album art";} else {img.removeAttribute("src");img.removeAttribute("alt");}}
@@ -318,6 +331,11 @@ function clampClip(player,seconds=CLIP_LEN){
   clipTimer=setInterval(()=>{if(player.currentTime>=endAt-0.05){player.pause();clearInterval(clipTimer);}},120);
 }
 function render(){
+  // reset navigation state
+  answered=false;
+  clearAutoNext();
+  enableNext(false);
+
   const q=QUESTIONS[idx];
   $("#crumb").textContent=`${q.category} · Q ${idx+1}/${QUESTIONS.length}`;
   $("#scoreMini").textContent=`Score: ${score}`;
@@ -342,25 +360,42 @@ function render(){
     q.options.forEach(opt=>{
       const b=document.createElement("button"); b.className="option"; b.textContent=opt;
       b.onclick=()=>{
+        if(answered) return;                // guard double taps
+        answered=true;
         const ok=(opt===q.answer);
         if(ok){b.classList.add("correct");score++;perRound[q.category]++;}
         else{b.classList.add("incorrect");[...op.children].forEach(c=>{if(c.textContent===q.answer)c.classList.add("correct");});}
         answers[idx]={pick:opt,correct:ok,q}; $("#scoreMini").textContent=`Score: ${score}`;
+        enableNext(true);                   // allow manual Next
+        clearAutoNext();                    // auto-advance after a short beat
+        autoNextTimer=setTimeout(goNext, 900);
       };
       op.appendChild(b);
     });
   }else{
     op.classList.add("hidden"); tWrap.classList.remove("hidden");
     $("#btnCheck").onclick=()=>{
+      if(answered) return;
       const guess=input.value,n=normalize(guess);
       const ok=(n===q.answerNorm)||q.answerNorm.includes(n)||n.includes(q.answerNorm);
+      answered=true;
       feedback.textContent=ok?`Correct — ${q.answerText}`:`Not quite. Correct: ${q.answerText}`;
       feedback.className="feedback "+(ok?"good":"bad");
       if(answers[idx]==null){ if(ok){score++;perRound[q.category]++;} answers[idx]={pick:guess,correct:ok,q}; }
       $("#scoreMini").textContent=`Score: ${score}`;
+      enableNext(true);
+      clearAutoNext();
+      autoNextTimer=setTimeout(goNext, 1200);
     };
-    input.onkeydown=e=>{if(e.key==="Enter")$("#btnCheck").click();};
+    input.onkeydown=e=>{ if(e.key==="Enter") $("#btnCheck").click(); };
   }
+}
+
+/* ---------- Nav ---------- */
+function goNext(){
+  clearAutoNext();
+  if(idx<QUESTIONS.length-1){ idx++; render(); }
+  else { finish(); }
 }
 
 /* ---------- Results ---------- */
@@ -416,8 +451,8 @@ $("#btnStart").onclick=async ()=>{
   $("#screen-quiz").classList.add("active");
   render();
 };
-$("#btnPrev").onclick=()=>{ if(idx>0){idx--;render();} };
-$("#btnNext").onclick=()=>{ if(idx<QUESTIONS.length-1){idx++;render();} else {finish();} };
+$("#btnPrev").onclick=()=>{ if(idx>0){ idx--; render(); } };
+$("#btnNext").onclick=goNext;
 $("#btnRestart").onclick=()=>{ document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active")); $("#screen-start").classList.add("active"); $("#status").textContent=""; };
 $("#btnAgain").onclick=()=>{ $("#btnRestart").click(); };
 </script>
