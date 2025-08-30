@@ -3,115 +3,162 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Music Quiz — 50 Q (15–20s clips)</title>
+<title>Music Quiz — Start & Play</title>
 
-<!-- iOS feel -->
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Music Quiz">
 
 <style>
 :root{
-  --bg:#0e1013; --panel:#171a20; --ink:#f6f7fb; --muted:#aeb5c2;
-  --accent:#4aa8ff; --good:#22c55e; --bad:#ef4444; --line:#232733;
-  --btn:#1d212b; --btnLine:#2a3040;
+  --bg:#0e1013; --panel:#141821; --ink:#f6f7fb; --muted:#aeb5c2;
+  --accent:#4aa8ff; --good:#22c55e; --bad:#ef4444; --line:#2a3040;
+  --btn:#1a1f2a; --btnLine:#2d3344;
 }
 html,body{height:100%;margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial,sans-serif}
-.app-wrap{position:fixed;inset:0;display:grid;place-items:center;padding:8vmin 4vmin}
+*{box-sizing:border-box}
 
+/* App container / stage */
+.app{position:fixed; inset:0; display:grid; place-items:center; padding:6vmin 3vmin;}
 .stage{
-  aspect-ratio:16/9; width:100vw; height:calc(100vw*9/16);
-  max-width:1600px; max-height:900px;
-  background:linear-gradient(180deg,#0f1218,#0b0d12);
-  border:1px solid var(--line); border-radius:18px; box-shadow:0 30px 80px rgba(0,0,0,.5);
-  overflow:hidden; display:flex; flex-direction:column;
-  container-type:inline-size;
+  width:100vw; height:calc(100vw*9/16); max-width:1600px; max-height:900px;
+  aspect-ratio:16/9; background:linear-gradient(180deg,#0f1218,#0b0d12);
+  border:1px solid var(--line); border-radius:20px; overflow:hidden;
+  box-shadow:0 30px 80px rgba(0,0,0,.5);
+  display:flex; flex-direction:column;
 }
-@media(min-aspect-ratio:16/9){ .stage{height:100vh;width:calc(100vh*16/9);} }
+@media (min-aspect-ratio:16/9){ .stage{height:100vh; width:calc(100vh*16/9);} }
+@media (max-width:900px){ .app{padding:0} .stage{width:100vw;height:100vh;aspect-ratio:auto;border-radius:0}}
 
-.header{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid var(--line)}
-.brand{font-weight:800}
-.badge{font-size:12px;color:var(--muted)}
-.score-chip{background:var(--panel);border:1px solid var(--line);border-radius:999px;padding:6px 10px}
+/* Header */
+.header{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid var(--line)}
+.brand{font-weight:900; font-size:clamp(16px,2.2vh,22px)}
+.badge{font-size:clamp(11px,1.6vh,14px); color:var(--muted)}
+.chip{background:var(--panel);border:1px solid var(--line);border-radius:999px;padding:6px 10px;font-size:clamp(12px,1.7vh,16px)}
 
-.screen{display:none;height:100%;overflow:auto}
+/* Screens */
+.screen{display:none;height:100%;overflow:hidden}
 .screen.active{display:block}
 
-.start{display:grid;grid-template-rows:auto 1fr auto;height:100%}
-.start-main{display:grid;place-items:center;padding:2vmin}
-.cta{display:grid;gap:16px;text-align:center;max-width:900px}
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:12px 16px;border-radius:12px;cursor:pointer;border:1px solid var(--btnLine);background:var(--btn);color:var(--ink)}
-.btn.primary{background:var(--accent);color:#08131f;border-color:#2d7ed1;font-weight:800}
+/* Buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:.6em;padding:.9em 1.2em;border-radius:12px;cursor:pointer;border:1px solid var(--btnLine);background:var(--btn);color:var(--ink);font-size:clamp(15px,1.9vh,18px)}
+.btn.primary{background:var(--accent);color:#07121e;border-color:#2a7ed6;font-weight:800}
 .btn.ghost{background:transparent}
-.small{color:var(--muted);font-size:12px}
+.small{color:var(--muted);font-size:clamp(12px,1.6vh,14px)}
 
-.quiz{display:grid;grid-template-rows:1fr auto;height:100%}
-.qwrap{padding:18px;display:grid;grid-template-columns:minmax(0,42%) minmax(0,58%);gap:18px;min-height:0;height:100%}
-.media,.qpanel{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px;display:flex;flex-direction:column;min-height:0}
-.art{border-radius:10px;overflow:hidden;background:#0a0c11;aspect-ratio:1/1;margin-bottom:10px}
-.art img{width:100%;height:100%;object-fit:cover}
-audio{width:100%;max-width:100%}
-.meta{font-size:12px;color:var(--muted);margin-top:6px}
-.playrow{display:flex;gap:10px;margin:8px 0 0}
+/* START screen */
+.start-wrap{height:100%;display:grid;grid-template-rows:1fr auto;gap:0;padding:3vh}
+.start-main{display:grid;place-items:center}
+.card{
+  background:var(--panel); border:1px solid var(--line); border-radius:18px;
+  padding:3vh; width:min(90vw,860px); display:grid; gap:2vh; text-align:center;
+}
+.title{font-weight:900; font-size:clamp(22px,3.2vh,38px)}
+.sub{color:var(--muted); font-size:clamp(12px,1.9vh,18px)}
+.status{min-height:2.4vh}
 
-.category{font-size:13px;color:var(--muted)}
-.question{font-size:22px;font-weight:800;margin:6px 0 10px}
-.options{display:grid;gap:10px;margin-top:10px;overflow:auto;-webkit-overflow-scrolling:touch;min-height:0}
-.option{background:var(--btn);border:1px solid var(--btnLine);border-radius:12px;padding:12px;text-align:left;cursor:pointer}
+/* Loading overlay */
+.loading{position:absolute; inset:0; background:rgba(10,12,18,.85); display:none; align-items:center; justify-content:center}
+.loading.active{display:flex}
+.loadcard{background:#0f1320;border:1px solid #26314a;border-radius:16px;padding:2.6vh 3.2vh;display:grid;gap:1.4vh;width:min(92vw,520px);text-align:center}
+.spinner{width:38px;height:38px;border:4px solid #253146;border-top-color:var(--accent);border-radius:50%;margin:0 auto;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.progress{color:var(--muted); font-size:clamp(12px,1.9vh,18px)}
+
+/* QUIZ layout */
+.quiz{height:100%;display:grid;grid-template-rows:1fr auto}
+.qwrap{height:100%;padding:1.2vh;display:grid;grid-template-columns:1fr 1fr;gap:1.2vh}
+@media (max-width:1100px){ .qwrap{grid-template-columns:1fr;grid-template-rows:1fr 1fr} }
+
+/* MEDIA column (no scroll; auto-fit) */
+.media{
+  background:var(--panel); border:1px solid var(--line); border-radius:16px; padding:1.2vh;
+  height:100%; display:grid; gap:1vh;
+  grid-template-rows: 6fr 1.6fr 1.2fr .8fr;  /* art / audio / buttons / meta */
+  min-height:0;
+}
+.art{background:#0a0c11;border-radius:12px;overflow:hidden;display:grid;place-items:center;min-height:0}
+.art img{width:100%;height:100%;object-fit:cover;display:block}
+audio{width:100%;height:100%;max-height:8vh;align-self:center}
+.playrow{display:grid;grid-auto-flow:column;gap:1vh}
+@media (max-width:700px){ .playrow{grid-auto-flow:row} .playrow .btn{width:100%} }
+.meta{font-size:clamp(12px,1.8vh,18px);color:var(--muted);align-self:center;text-align:center}
+
+/* QUESTION column (no scroll; auto-fit) */
+.qpanel{
+  background:var(--panel); border:1px solid var(--line); border-radius:16px; padding:1.2vh;
+  height:100%; display:grid; gap:1vh;
+  grid-template-rows: auto auto 1fr auto;  /* cat / question / options / free-text */
+  min-height:0;
+}
+.category{color:var(--muted); font-size:clamp(12px,1.8vh,18px)}
+.question{font-weight:900; line-height:1.15; font-size:clamp(18px,3.1vh,36px)}
+.options{display:grid; gap:1vh; align-content:stretch; grid-template-rows:repeat(4,1fr); min-height:0}
+.option{display:flex;align-items:center;justify-content:center;text-align:center;background:var(--btn);border:1px solid var(--btnLine);border-radius:12px;padding:1vh;cursor:pointer;line-height:1.2;font-size:clamp(14px,2.1vh,22px)}
 .option:hover{border-color:var(--accent)}
 .option.correct{border-color:var(--good)}
 .option.incorrect{border-color:var(--bad)}
-
-.text-ans{display:flex;gap:8px;margin-top:10px}
-.text-ans input{flex:1;min-width:0;padding:12px 12px;border-radius:10px;border:1px solid var(--btnLine);background:#121520;color:var(--ink);font-size:16px}
-.feedback{font-size:14px;margin-top:8px}
-.feedback.good{color:var(--good)}
-.feedback.bad{color:var(--bad)}
-
-.navrow{display:flex;justify-content:space-between;gap:10px;padding:12px 18px;border-top:1px solid var(--line)}
-
-.results{display:grid;grid-template-rows:auto 1fr auto}
-.result-body{padding:18px;display:grid;grid-template-columns:1fr 1fr;gap:18px}
-.block{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px}
-.kv{display:grid;gap:6px}
-.review-list{display:grid;gap:10px;max-height:55vh;overflow:auto}
-.review-card{background:#1b1f29;border:1px solid var(--line);border-radius:12px;padding:10px;font-size:14px}
-
-.spinner{display:inline-block;width:16px;height:16px;border:2px solid #2a3040;border-top-color:var(--accent);border-radius:50%;animation:spin .75s linear infinite}
-@keyframes spin{to{transform:rotate(360deg)}}
-
-@container(max-width:900px){ .qwrap{grid-template-columns:1fr;grid-template-rows:auto 1fr} }
-@container(max-width:700px){ .question{font-size:20px} .option{padding:14px} }
+#textWrap{display:grid;gap:.8vh}
+.text-ans{display:grid;grid-template-columns:1fr auto;gap:.8vh}
+.text-ans input{width:100%;padding:1vh;border:1px solid var(--btnLine);border-radius:10px;background:#121725;color:var(--ink);font-size:clamp(14px,2.1vh,20px)}
+.feedback{font-size:clamp(12px,1.8vh,18px)}
+.feedback.good{color:var(--good)} .feedback.bad{color:var(--bad)}
 .hidden{display:none !important}
+
+/* Bottom nav */
+.nav{display:flex;justify-content:space-between;gap:10px;padding:10px 14px;border-top:1px solid var(--line)}
+
+/* RESULTS */
+.results{height:100%;display:grid;grid-template-rows:auto 1fr auto}
+.res-body{padding:1.2vh;height:100%;display:grid;grid-template-columns:1fr 1fr;gap:1.2vh}
+@media (max-width:1100px){ .res-body{grid-template-columns:1fr} }
+.block{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:1.2vh}
+.kv{display:grid;gap:.8vh;font-size:clamp(13px,2vh,18px)}
+.review{display:grid;gap:.8vh;height:100%;grid-auto-rows:minmax(0,1fr)}
+.review-card{background:#1a2030;border:1px solid var(--line);border-radius:12px;padding:1vh;display:grid;grid-template-rows:auto auto auto;gap:.4vh;font-size:clamp(12px,1.9vh,18px)}
+
 </style>
 </head>
 <body>
-<div class="app-wrap">
+<div class="app">
   <div class="stage">
+    <!-- HEADER -->
     <div class="header">
-      <div><div class="brand">Music Quiz</div><div class="badge" id="crumb">Ready</div></div>
-      <div class="score-chip" id="scoreMini">Score: 0</div>
+      <div>
+        <div class="brand">Music Quiz</div>
+        <div class="badge" id="crumb">Ready</div>
+      </div>
+      <div class="chip" id="scoreMini">Score: 0</div>
     </div>
 
-    <!-- START -->
-    <div class="screen start active" id="screen-start">
-      <div></div>
-      <div class="start-main">
-        <div class="cta">
-          <h1>50-Question Music Quiz</h1>
-          <div class="small">Streams 15–20s iTunes previews · Shows album art · Mix of multiple-choice & text answers</div>
-          <button class="btn primary" id="btnStartAll">Start Full Quiz</button>
-          <div class="small" id="fetchStatus"></div>
+    <!-- START (YES, big visible Start button) -->
+    <section class="screen active" id="screen-start">
+      <div class="start-wrap">
+        <div class="start-main">
+          <div class="card">
+            <div class="title">50-Question Music Quiz</div>
+            <div class="sub">iTunes previews (15–20s) · Album artwork · Multiple choice + free-text</div>
+            <button class="btn primary" id="btnStart">Start</button>
+            <div class="status small" id="status"></div>
+          </div>
+        </div>
+        <div class="small" style="text-align:center">Tip: Add to Home Screen · Use Screen Mirroring to cast</div>
+      </div>
+      <!-- Loading overlay -->
+      <div class="loading" id="loading">
+        <div class="loadcard">
+          <div class="spinner"></div>
+          <div class="progress" id="progressText">Building rounds…</div>
         </div>
       </div>
-      <div class="small" style="text-align:center;padding:10px">Tip: Add to Home Screen for full-screen. Use Screen Mirroring to cast to TV.</div>
-    </div>
+    </section>
 
     <!-- QUIZ -->
-    <div class="screen quiz" id="screen-quiz">
+    <section class="screen" id="screen-quiz">
       <div class="qwrap">
+        <!-- MEDIA -->
         <div class="media">
-          <div class="art" id="artBox"><img id="artImg" alt=""></div>
+          <div class="art"><img id="artImg" alt=""></div>
           <audio id="player" preload="none" playsinline controls x-webkit-airplay="allow"></audio>
           <div class="playrow">
             <button class="btn" id="btnPlay">Play Clip</button>
@@ -119,14 +166,12 @@ audio{width:100%;max-width:100%}
           </div>
           <div class="meta" id="meta"></div>
         </div>
+
+        <!-- QUESTIONS -->
         <div class="qpanel">
           <div class="category" id="category">Category</div>
           <div class="question" id="question">Question</div>
-
-          <!-- Multiple-choice container -->
           <div class="options" id="options"></div>
-
-          <!-- Text-answer container -->
           <div id="textWrap" class="hidden">
             <div class="text-ans">
               <input id="textInput" type="text" placeholder="Type your answer…">
@@ -136,21 +181,21 @@ audio{width:100%;max-width:100%}
           </div>
         </div>
       </div>
-      <div class="navrow">
+      <div class="nav">
         <button class="btn ghost" id="btnPrev">Back</button>
-        <div><button class="btn primary" id="btnNext">Next</button></div>
+        <button class="btn primary" id="btnNext">Next</button>
       </div>
-    </div>
+    </section>
 
     <!-- RESULTS -->
-    <div class="screen results" id="screen-results">
+    <section class="screen" id="screen-results">
       <div class="header" style="border:none">
         <div class="brand">Results</div>
-        <div class="score-chip"><span id="finalScore">0</span> / <span id="finalTotal">50</span></div>
+        <div class="chip"><span id="finalScore">0</span> / <span id="finalTotal">50</span></div>
       </div>
-      <div class="result-body">
+      <div class="res-body">
         <div class="block">
-          <h3 style="margin:0 0 8px">Round Scores</h3>
+          <h3 style="margin:0 0 .6vh">Round Scores</h3>
           <div class="kv">
             <div><strong>Albums:</strong> <span id="scAlbums">0</span> / 12</div>
             <div><strong>Intros:</strong> <span id="scIntros">0</span> / 12</div>
@@ -159,339 +204,222 @@ audio{width:100%;max-width:100%}
           </div>
         </div>
         <div class="block">
-          <h3 style="margin:0 0 8px">Review</h3>
-          <div class="review-list" id="review"></div>
+          <h3 style="margin:0 0 .6vh">Answer Review</h3>
+          <div class="review" id="review"></div>
         </div>
       </div>
-      <div class="navrow">
+      <div class="nav">
         <button class="btn" id="btnRestart">Restart</button>
-        <button class="btn primary" id="btnStartRounds">Start Again</button>
+        <button class="btn primary" id="btnAgain">Start Again</button>
       </div>
-    </div>
+    </section>
   </div>
 </div>
 
 <script>
-/* ===================== Config ===================== */
-const ROUND_SIZES = { "Albums":12, "Intros":12, "Year Released":13, "Band Members":13 };
+/* ---------- Config ---------- */
+const ROUND_SIZES={ "Albums":12, "Intros":12, "Year Released":13, "Band Members":13 };
+const CLIP_LEN=18; // target ~18s (within 15–20s)
 
-const ARTISTS = {
-  "1980s": ["Michael Jackson","Madonna","Prince","U2","Duran Duran","Whitney Houston","The Smiths","Depeche Mode","A-ha","Eurythmics","The Cure","Bon Jovi","Guns N' Roses","New Order","George Michael"],
-  "1990s": ["Oasis","Blur","Radiohead","Nirvana","Pearl Jam","Green Day","Spice Girls","Backstreet Boys","Mariah Carey","Britney Spears","Red Hot Chili Peppers","The Verve","R.E.M.","Beck","Metallica"],
-  "2000s": ["Coldplay","Beyoncé","Rihanna","Eminem","Kanye West","The Killers","Arcade Fire","Arctic Monkeys","Foo Fighters","Muse","Linkin Park","Lady Gaga","Kings of Leon","Taylor Swift","Alicia Keys"],
-  "2010s": ["Adele","Ed Sheeran","Dua Lipa","The Weeknd","Imagine Dragons","Billie Eilish","Bruno Mars","Kendrick Lamar","Harry Styles","Lorde","Hozier","Sia","Tame Impala","The 1975","Drake"],
-  "2020s": ["Olivia Rodrigo","Doja Cat","Måneskin","Sam Fender","The Kid LAROI","Tate McRae","Charli XCX","Sabrina Carpenter","Fred again..","Billie Eilish","Taylor Swift","Noah Kahan","Jung Kook","Bad Bunny","ROSALÍA"]
+const ARTISTS={
+  "1980s":["Michael Jackson","Madonna","Prince","U2","Duran Duran","Whitney Houston","The Smiths","Depeche Mode","A-ha","Eurythmics","The Cure","Bon Jovi","Guns N' Roses","New Order","George Michael"],
+  "1990s":["Oasis","Blur","Radiohead","Nirvana","Pearl Jam","Green Day","Spice Girls","Backstreet Boys","Mariah Carey","Britney Spears","Red Hot Chili Peppers","The Verve","R.E.M.","Beck","Metallica"],
+  "2000s":["Coldplay","Beyoncé","Rihanna","Eminem","Kanye West","The Killers","Arcade Fire","Arctic Monkeys","Foo Fighters","Muse","Linkin Park","Lady Gaga","Kings of Leon","Taylor Swift","Alicia Keys"],
+  "2010s":["Adele","Ed Sheeran","Dua Lipa","The Weeknd","Imagine Dragons","Billie Eilish","Bruno Mars","Kendrick Lamar","Harry Styles","Lorde","Hozier","Sia","Tame Impala","The 1975","Drake"],
+  "2020s":["Olivia Rodrigo","Doja Cat","Måneskin","Sam Fender","The Kid LAROI","Tate McRae","Charli XCX","Sabrina Carpenter","Fred again..","Billie Eilish","Taylor Swift","Noah Kahan","Jung Kook","Bad Bunny","ROSALÍA"]
 };
-
-// Multiple-choice for Members (keeps UX simple & reliable)
-const MEMBER_QUESTIONS = [
-  { q:"Name any two members of U2.", options:["Bono & The Edge","Bono & Dave Grohl","Noel & Liam Gallagher","Sting & Andy Summers"], a:"Bono & The Edge" },
-  { q:"Who was Nirvana’s drummer on Nevermind?", options:["Dave Grohl","Taylor Hawkins","Tré Cool","Lars Ulrich"], a:"Dave Grohl" },
-  { q:"Which duo fronted Oasis?", options:["Noel & Liam Gallagher","Chris & Jonny","Jack & Meg White","Guy & Mark"], a:"Noel & Liam Gallagher" },
-  { q:"Who is the lead singer of The Cure?", options:["Robert Smith","Morrissey","Thom Yorke","Brandon Flowers"], a:"Robert Smith" },
-  { q:"Name any two members of ABBA.", options:["Agnetha & Anni-Frid","Beyoncé & Kelly","Lorde & Jack","Gwen & Tony"], a:"Agnetha & Anni-Frid" },
-  { q:"Who is the lead vocalist of Radiohead?", options:["Thom Yorke","Chris Martin","Matt Bellamy","Alex Turner"], a:"Thom Yorke" },
-  { q:"Name the two core members of The White Stripes.", options:["Jack & Meg White","Jack White & Alison","Josh & Troy","Jack & Dave"], a:"Jack & Meg White" },
-  { q:"Who is the frontman of Coldplay?", options:["Chris Martin","Brandon Flowers","Bono","Dan Reynolds"], a:"Chris Martin" },
-  { q:"Name any two members of Red Hot Chili Peppers.", options:["Anthony & Flea","Kurt & Krist","Axl & Slash","Dave & Nate"], a:"Anthony & Flea" },
-  { q:"Who is the primary vocalist of Paramore?", options:["Hayley Williams","Amy Lee","Karen O","Shirley Manson"], a:"Hayley Williams" },
-  { q:"Name any two members of Metallica.", options:["James Hetfield & Lars Ulrich","Dave Grohl & Pat Smear","Matt Bellamy & Chris Wolstenholme","Axl Rose & Duff McKagan"], a:"James Hetfield & Lars Ulrich" },
-  { q:"Who fronted The Smiths?", options:["Morrissey","Robert Smith","Brett Anderson","Ian Curtis"], a:"Morrissey" },
-  { q:"Who is the bassist of Muse?", options:["Chris Wolstenholme","Flea","John Paul Jones","Nikki Sixx"], a:"Chris Wolstenholme" }
+const MEMBER_QUESTIONS=[
+  {q:"Name any two members of U2.",options:["Bono & The Edge","Bono & Dave Grohl","Noel & Liam Gallagher","Sting & Andy Summers"],a:"Bono & The Edge"},
+  {q:"Who was Nirvana’s drummer on Nevermind?",options:["Dave Grohl","Taylor Hawkins","Tré Cool","Lars Ulrich"],a:"Dave Grohl"},
+  {q:"Which duo fronted Oasis?",options:["Noel & Liam Gallagher","Chris & Jonny","Jack & Meg White","Guy & Mark"],a:"Noel & Liam Gallagher"},
+  {q:"Who is the lead singer of The Cure?",options:["Robert Smith","Morrissey","Thom Yorke","Brandon Flowers"],a:"Robert Smith"},
+  {q:"Name any two members of ABBA.",options:["Agnetha & Anni-Frid","Beyoncé & Kelly","Lorde & Jack","Gwen & Tony"],a:"Agnetha & Anni-Frid"},
+  {q:"Who is the lead vocalist of Radiohead?",options:["Thom Yorke","Chris Martin","Matt Bellamy","Alex Turner"],a:"Thom Yorke"},
+  {q:"Name the two core members of The White Stripes.",options:["Jack & Meg White","Jack White & Alison","Josh & Troy","Jack & Dave"],a:"Jack & Meg White"},
+  {q:"Who is the frontman of Coldplay?",options:["Chris Martin","Brandon Flowers","Bono","Dan Reynolds"],a:"Chris Martin"},
+  {q:"Name any two members of Red Hot Chili Peppers.",options:["Anthony & Flea","Kurt & Krist","Axl & Slash","Dave & Nate"],a:"Anthony & Flea"},
+  {q:"Who is the primary vocalist of Paramore?",options:["Hayley Williams","Amy Lee","Karen O","Shirley Manson"],a:"Hayley Williams"},
+  {q:"Name any two members of Metallica.",options:["James Hetfield & Lars Ulrich","Dave Grohl & Pat Smear","Matt Bellamy & Chris Wolstenholme","Axl Rose & Duff McKagan"],a:"James Hetfield & Lars Ulrich"},
+  {q:"Who fronted The Smiths?",options:["Morrissey","Robert Smith","Brett Anderson","Ian Curtis"],a:"Morrissey"},
+  {q:"Who is the bassist of Muse?",options:["Chris Wolstenholme","Flea","John Paul Jones","Nikki Sixx"],a:"Chris Wolstenholme"}
 ];
 
-/* ===================== Helpers ===================== */
-const $ = s => document.querySelector(s);
-const shuffle = a => a.sort(()=>Math.random()-0.5);
-const uniqBy = (arr, keyFn) => { const seen = new Set(); return arr.filter(x=>{ const k=keyFn(x); if(seen.has(k)) return false; seen.add(k); return true; }); };
+/* ---------- Helpers ---------- */
+const $=s=>document.querySelector(s);
+const shuffle=a=>a.sort(()=>Math.random()-0.5);
+const uniqBy=(arr,f)=>{const seen=new Set();return arr.filter(x=>{const k=f(x);if(seen.has(k))return false;seen.add(k);return true;});};
+const normalize=s=>(s||"").toLowerCase().replace(/\(.*?\)|\[.*?]|feat\.?.*$/gi,"").replace(/[-–—]|remaster(?:ed)?|radio edit|single version|album version|live|version/gi," ").replace(/[^a-z0-9 ]+/gi," ").replace(/\s+/g," ").trim();
+const yearStr=d=>new Date(d).getFullYear().toString();
+const hiResArt=url=>url?url.replace(/\/\d{2,4}x\d{2,4}(?=[^/]*$)/,"/600x600"):null;
 
-const normalize = s => (s||"")
-  .toLowerCase()
-  .replace(/\(.*?\)|\[.*?]|feat\.?.*$/gi,"")
-  .replace(/[-–—]|remaster(?:ed)?|radio edit|single version|album version|live|version/gi," ")
-  .replace(/[^a-z0-9 ]+/gi," ")
-  .replace(/\s+/g," ")
-  .trim();
-
-const yearStr = d => new Date(d).getFullYear().toString();
-const hiResArt = url => url ? url.replace(/\/\d{2,4}x\d{2,4}(?=[^/]*$)/, "/600x600") : null;
-
-/* ===================== iTunes Search ===================== */
-async function searchSongs(artist, limit=50, country="GB"){
-  const url = `https://itunes.apple.com/search?term=${encodeURIComponent(artist)}&entity=song&limit=${limit}&country=${country}`;
-  const r = await fetch(url);
-  if(!r.ok) throw new Error("iTunes HTTP "+r.status);
-  const j = await r.json();
-  const rows = (j.results||[]).filter(x => x.previewUrl && x.trackName && x.collectionName && x.releaseDate);
-  return uniqBy(rows, r => `${r.artistName}|${r.trackName}|${r.collectionName}`);
+/* ---------- iTunes ---------- */
+async function searchSongs(artist,limit=50,country="GB"){
+  const url=`https://itunes.apple.com/search?term=${encodeURIComponent(artist)}&entity=song&limit=${limit}&country=${country}`;
+  const r=await fetch(url); if(!r.ok) throw new Error("iTunes HTTP "+r.status);
+  const j=await r.json();
+  const rows=(j.results||[]).filter(x=>x.previewUrl&&x.trackName&&x.collectionName&&x.releaseDate);
+  return uniqBy(rows, r=>`${r.artistName}|${r.trackName}|${r.collectionName}`);
 }
-
-async function buildPool(updateStatus){
-  const decades = Object.keys(ARTISTS);
-  const chosen = decades.flatMap(dec => shuffle([...ARTISTS[dec]]).slice(0,3)); // 3 per decade → ~15 artists
-  let pool = [];
-  let done = 0;
+async function buildPool(update){
+  const decades=Object.keys(ARTISTS);
+  const chosen=decades.flatMap(dec=>shuffle([...ARTISTS[dec]]).slice(0,3)); // ~15 artists
+  let pool=[],done=0;
   for(const artist of chosen){
-    try{
-      updateStatus?.(`Fetching ${artist} <span class="spinner"></span>`);
-      const items = await searchSongs(artist, 50);
-      pool.push(...shuffle(items).slice(0,6)); // keep variety
-    }catch(e){
-      // skip artist on failure
-    } finally {
-      done++; updateStatus?.(`Fetched ${done}/${chosen.length} artists`);
+    try{update?.(`Fetching ${artist}…`); const items=await searchSongs(artist,50); pool.push(...shuffle(items).slice(0,6));}
+    catch{} finally{done++; update?.(`Fetched ${done}/${chosen.length}`);}
+  }
+  if(pool.length<80){
+    const all=decades.flatMap(d=>ARTISTS[d]);
+    for(let i=0;i<40&&pool.length<100;i++){
+      const a=all[Math.floor(Math.random()*all.length)];
+      try{update?.(`Topping up with ${a}…`); const items=await searchSongs(a,30); pool.push(...shuffle(items).slice(0,4));}catch{}
     }
   }
-  if(pool.length < 80){ // top up if needed
-    const all = decades.flatMap(d => ARTISTS[d]);
-    for(let i=0;i<40 && pool.length<100;i++){
-      const a = all[Math.floor(Math.random()*all.length)];
-      try{
-        updateStatus?.(`Topping up with ${a} <span class="spinner"></span>`);
-        const items = await searchSongs(a, 30);
-        pool.push(...shuffle(items).slice(0,4));
-      }catch{}
-    }
-  }
-  updateStatus?.("Tracks ready.");
+  update?.("Tracks ready");
   return pool;
 }
 
-/* ===================== Question builders ===================== */
-function qAlbums(entry,pool){
-  const correct = entry.collectionName;
-  const wrong = uniqBy(
-    shuffle(pool).map(x=>x.collectionName).filter(n => n && n!==correct),
-    x=>x
-  ).slice(0,3);
-  return {
-    category:"Albums",
-    mode:"choice",
-    audio: entry.previewUrl,
-    meta: entry.artistName,
-    artwork: hiResArt(entry.artworkUrl100),
-    question:"Which album is this track from?",
-    options: shuffle([correct,...wrong]),
-    answer: correct
-  };
+/* ---------- Build Questions ---------- */
+function qAlbums(e,pool){
+  const correct=e.collectionName;
+  const wrong=uniqBy(shuffle(pool).map(x=>x.collectionName).filter(n=>n&&n!==correct),x=>x).slice(0,3);
+  return {category:"Albums",mode:"choice",audio:e.previewUrl,meta:e.artistName,artwork:hiResArt(e.artworkUrl100),
+          question:"Which album is this track from?",options:shuffle([correct,...wrong]),answer:correct};
 }
-
-function qIntros(entry){
-  const correct = entry.trackName;
-  return {
-    category:"Intros",
-    mode:"text",
-    audio: entry.previewUrl,
-    meta: entry.artistName,
-    artwork: hiResArt(entry.artworkUrl100),
-    question:"Name the track from this intro.",
-    answerText: correct,
-    answerNorm: normalize(correct)
-  };
+function qIntros(e){
+  const correct=e.trackName;
+  return {category:"Intros",mode:"text",audio:e.previewUrl,meta:e.artistName,artwork:hiResArt(e.artworkUrl100),
+          question:"Name the track from this intro.",answerText:correct,answerNorm:normalize(correct)};
 }
-
-function qYears(entry){
-  const correct = yearStr(entry.releaseDate);
-  const base = parseInt(correct,10);
-  const picks = new Set([correct, String(base-1), String(base+1), String(base-3), String(base+3), String(base-7), String(base+7)]);
-  const options = shuffle([...picks]).slice(0,4);
-  return {
-    category:"Year Released",
-    mode:"choice",
-    audio: entry.previewUrl,
-    meta: `${entry.artistName} — ${entry.trackName}`,
-    artwork: hiResArt(entry.artworkUrl100),
-    question:"What year was this released?",
-    options: shuffle(options),
-    answer: correct
-  };
+function qYears(e){
+  const correct=yearStr(e.releaseDate),base=parseInt(correct,10);
+  const picks=new Set([correct,String(base-1),String(base+1),String(base-3),String(base+3),String(base-7),String(base+7)]);
+  const opts=shuffle([...picks]).slice(0,4);
+  return {category:"Year Released",mode:"choice",audio:e.previewUrl,meta:`${e.artistName} — ${e.trackName}`,artwork:hiResArt(e.artworkUrl100),
+          question:"What year was this released?",options:shuffle(opts),answer:correct};
 }
-
 function memberQs(){
-  return MEMBER_QUESTIONS.map(x=>({
-    category:"Band Members",
-    mode:"choice",
-    audio:null,
-    meta:"",
-    artwork:null,
-    question:x.q,
-    options: shuffle([...x.options]),
-    answer: x.a
-  }));
+  return MEMBER_QUESTIONS.map(x=>({category:"Band Members",mode:"choice",audio:null,meta:"",artwork:null,question:x.q,options:shuffle([...x.options]),answer:x.a}));
 }
 
-/* ===================== Game state ===================== */
-let QUESTIONS=[], idx=0, score=0;
-let perRound = { "Albums":0, "Intros":0, "Year Released":0, "Band Members":0 };
-let answers = []; // { pick, correct, q }
-let clipTimer = null;
-const CLIP_LEN = 18; // seconds (within 15–20 window)
+/* ---------- State ---------- */
+let QUESTIONS=[],idx=0,score=0;
+let perRound={"Albums":0,"Intros":0,"Year Released":0,"Band Members":0};
+let answers=[];
+let clipTimer=null;
 
-function show(id){
-  document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
-  document.getElementById(id).classList.add("active");
-}
-
-function clampClip(player, seconds=CLIP_LEN){
-  if(!player.duration || isNaN(player.duration)) return;
-  try { player.currentTime = 0; } catch{}
+/* ---------- Rendering ---------- */
+function setArt(url,cap){const img=$("#artImg"); if(url){img.src=url;img.alt=cap||"Album art";} else {img.removeAttribute("src");img.removeAttribute("alt");}}
+function clampClip(player,seconds=CLIP_LEN){
+  if(!player.duration||isNaN(player.duration))return;
+  try{player.currentTime=0;}catch{}
   clearInterval(clipTimer);
-  const endAt = Math.min(seconds, player.duration);
-  clipTimer = setInterval(()=>{
-    if(player.currentTime >= endAt - 0.05){
-      player.pause(); clearInterval(clipTimer);
-    }
-  }, 120);
+  const endAt=Math.min(seconds,player.duration);
+  clipTimer=setInterval(()=>{if(player.currentTime>=endAt-0.05){player.pause();clearInterval(clipTimer);}},120);
 }
-
-function setArtwork(url, caption){
-  const box = $("#artBox"), img = $("#artImg");
-  if(url){
-    box.classList.remove("hidden");
-    img.src = url;
-    img.alt = caption || "Album artwork";
-  }else{
-    box.classList.add("hidden");
-    img.removeAttribute("src");
-    img.removeAttribute("alt");
-  }
-}
-
 function render(){
-  const q = QUESTIONS[idx];
-  $("#crumb").innerHTML = `${q.category} · Q ${idx+1}/${QUESTIONS.length}`;
-  $("#scoreMini").textContent = `Score: ${score}`;
-  $("#category").textContent = q.category;
-  $("#question").textContent = q.question;
+  const q=QUESTIONS[idx];
+  $("#crumb").textContent=`${q.category} · Q ${idx+1}/${QUESTIONS.length}`;
+  $("#scoreMini").textContent=`Score: ${score}`;
+  $("#category").textContent=q.category;
+  $("#question").textContent=q.question;
 
-  // artwork
-  setArtwork(q.artwork, q.meta);
-
-  // audio
-  const player = $("#player");
-  const meta = $("#meta");
-  player.pause();
-  player.removeAttribute("src");
+  setArt(q.artwork,q.meta);
+  const p=$("#player"), meta=$("#meta");
+  p.pause(); p.removeAttribute("src");
   if(q.audio){
-    player.src = q.audio;
-    meta.textContent = q.meta || "";
-    $("#btnPlay").onclick = ()=> player.play().then(()=> clampClip(player, CLIP_LEN)).catch(()=>{});
-    $("#btnReplay").onclick = ()=> player.play().then(()=> clampClip(player, CLIP_LEN)).catch(()=>{});
+    p.src=q.audio; meta.textContent=q.meta||"";
+    $("#btnPlay").onclick=()=>p.play().then(()=>clampClip(p)).catch(()=>{});
+    $("#btnReplay").onclick=()=>p.play().then(()=>clampClip(p)).catch(()=>{});
   }else{
-    meta.textContent = "";
-    $("#btnPlay").onclick = null;
-    $("#btnReplay").onclick = null;
+    meta.textContent=""; $("#btnPlay").onclick=null; $("#btnReplay").onclick=null;
   }
 
-  // options/text modes
-  const op = $("#options");
-  const tWrap = $("#textWrap");
-  const feedback = $("#feedback");
-  const input = $("#textInput");
-  op.innerHTML = ""; feedback.textContent = ""; input.value = "";
-
-  if(q.mode === "choice"){
-    tWrap.classList.add("hidden");
-    op.classList.remove("hidden");
+  const op=$("#options"), tWrap=$("#textWrap"), feedback=$("#feedback"), input=$("#textInput");
+  op.innerHTML=""; feedback.textContent=""; input.value="";
+  if(q.mode==="choice"){
+    tWrap.classList.add("hidden"); op.classList.remove("hidden");
     q.options.forEach(opt=>{
-      const b = document.createElement("button");
-      b.className = "option";
-      b.textContent = opt;
-      b.onclick = ()=>{
-        const ok = (opt === q.answer);
-        if(ok){ b.classList.add("correct"); score++; perRound[q.category]++; }
-        else{
-          b.classList.add("incorrect");
-          [...op.children].forEach(c=>{ if(c.textContent===q.answer) c.classList.add("correct"); });
-        }
-        answers[idx] = { pick: opt, correct: ok, q };
-        $("#scoreMini").textContent = `Score: ${score}`;
+      const b=document.createElement("button"); b.className="option"; b.textContent=opt;
+      b.onclick=()=>{
+        const ok=(opt===q.answer);
+        if(ok){b.classList.add("correct");score++;perRound[q.category]++;}
+        else{b.classList.add("incorrect");[...op.children].forEach(c=>{if(c.textContent===q.answer)c.classList.add("correct");});}
+        answers[idx]={pick:opt,correct:ok,q}; $("#scoreMini").textContent=`Score: ${score}`;
       };
       op.appendChild(b);
     });
-  }else{ // text
-    op.classList.add("hidden");
-    tWrap.classList.remove("hidden");
-    $("#btnCheck").onclick = ()=>{
-      const guess = input.value;
-      const ok = normalize(guess) === q.answerNorm || q.answerNorm.includes(normalize(guess)) || normalize(guess).includes(q.answerNorm);
-      feedback.textContent = ok ? `Correct — ${q.answerText}` : `Not quite. Correct: ${q.answerText}`;
-      feedback.className = "feedback " + (ok ? "good" : "bad");
-      if(answers[idx]==null){ if(ok){ score++; perRound[q.category]++; } answers[idx] = { pick: guess, correct: ok, q }; }
-      $("#scoreMini").textContent = `Score: ${score}`;
+  }else{
+    op.classList.add("hidden"); tWrap.classList.remove("hidden");
+    $("#btnCheck").onclick=()=>{
+      const guess=input.value,n=normalize(guess);
+      const ok=(n===q.answerNorm)||q.answerNorm.includes(n)||n.includes(q.answerNorm);
+      feedback.textContent=ok?`Correct — ${q.answerText}`:`Not quite. Correct: ${q.answerText}`;
+      feedback.className="feedback "+(ok?"good":"bad");
+      if(answers[idx]==null){ if(ok){score++;perRound[q.category]++;} answers[idx]={pick:guess,correct:ok,q}; }
+      $("#scoreMini").textContent=`Score: ${score}`;
     };
-    input.onkeydown = (e)=>{ if(e.key==="Enter") $("#btnCheck").click(); };
+    input.onkeydown=e=>{if(e.key==="Enter")$("#btnCheck").click();};
   }
 }
 
+/* ---------- Results ---------- */
 function finish(){
-  show("screen-results");
-  $("#finalScore").textContent = score;
-  $("#finalTotal").textContent = QUESTIONS.length;
-  $("#scAlbums").textContent = perRound["Albums"];
-  $("#scIntros").textContent = perRound["Intros"];
-  $("#scYears").textContent = perRound["Year Released"];
-  $("#scMembers").textContent = perRound["Band Members"];
-  const list = $("#review");
-  list.innerHTML = "";
+  document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
+  $("#screen-results").classList.add("active");
+  $("#finalScore").textContent=score;
+  $("#finalTotal").textContent=QUESTIONS.length;
+  $("#scAlbums").textContent=perRound["Albums"];
+  $("#scIntros").textContent=perRound["Intros"];
+  $("#scYears").textContent=perRound["Year Released"];
+  $("#scMembers").textContent=perRound["Band Members"];
+  const list=$("#review"); list.innerHTML="";
   answers.forEach((a,i)=>{
     if(!a) return;
-    const d = document.createElement("div");
-    d.className = "review-card";
-    d.innerHTML = `<div><strong>Q${i+1} · ${a.q.category}</strong></div>
-                   <div>${a.q.question}</div>
-                   <div>Your answer: ${a.pick ?? "—"} ${a.correct ? "✅" : "❌"} · Correct: ${a.q.mode==="choice" ? a.q.answer : a.q.answerText}</div>`;
+    const d=document.createElement("div"); d.className="review-card";
+    const correctText=a.q.mode==="choice"?a.q.answer:a.q.answerText;
+    d.innerHTML=`<div><strong>Q${i+1} · ${a.q.category}</strong></div>
+                 <div>${a.q.question}</div>
+                 <div>Your answer: ${a.pick??"—"} ${a.correct?"✅":"❌"} · Correct: ${correctText}</div>`;
     list.appendChild(d);
   });
 }
 
-/* ===================== Build full 50-Q set ===================== */
-async function makeQuestions(updateStatus){
-  const pool = await buildPool(updateStatus);
-
-  // Albums (MC)
-  const albumsPick = shuffle(pool).slice(0, ROUND_SIZES["Albums"]);
-  const albumsQs = albumsPick.map(p => qAlbums(p, pool));
-
-  // Intros (text)
-  const introsPick = shuffle(pool).slice(ROUND_SIZES["Albums"], ROUND_SIZES["Albums"] + ROUND_SIZES["Intros"]);
-  const introsQs = introsPick.map(p => qIntros(p));
-
-  // Year Released (MC)
-  const yearsPick = shuffle(pool).slice(ROUND_SIZES["Albums"] + ROUND_SIZES["Intros"],
-                                        ROUND_SIZES["Albums"] + ROUND_SIZES["Intros"] + ROUND_SIZES["Year Released"]);
-  const yearsQs = yearsPick.map(p => qYears(p));
-
-  // Band Members (MC bank)
-  const membersQs = memberQs().slice(0, ROUND_SIZES["Band Members"]);
-
-  return shuffle([...albumsQs, ...introsQs, ...yearsQs, ...membersQs]);
+/* ---------- Build 50 Q ---------- */
+async function buildQuestions(update){
+  const pool=await buildPool(update);
+  const albumsPick=shuffle(pool).slice(0,ROUND_SIZES["Albums"]);
+  const introsPick=shuffle(pool).slice(ROUND_SIZES["Albums"],ROUND_SIZES["Albums"]+ROUND_SIZES["Intros"]);
+  const yearsPick=shuffle(pool).slice(ROUND_SIZES["Albums"]+ROUND_SIZES["Intros"],
+                                      ROUND_SIZES["Albums"]+ROUND_SIZES["Intros"]+ROUND_SIZES["Year Released"]);
+  const qs1=albumsPick.map(p=>qAlbums(p,pool));
+  const qs2=introsPick.map(p=>qIntros(p));
+  const qs3=yearsPick.map(p=>qYears(p));
+  const qs4=memberQs().slice(0,ROUND_SIZES["Band Members"]);
+  return shuffle([...qs1,...qs2,...qs3,...qs4]);
 }
 
-/* ===================== Controllers ===================== */
-$("#btnStartAll").onclick = async ()=>{
-  show("screen-start");
-  const status = $("#fetchStatus");
-  status.innerHTML = `Building rounds <span class="spinner"></span>`;
+/* ---------- Controls ---------- */
+$("#btnStart").onclick=async ()=>{
+  const overlay=$("#loading"), prog=$("#progressText");
+  overlay.classList.add("active");
   try{
-    QUESTIONS = await makeQuestions((msg)=> status.innerHTML = msg);
-    // reset state
-    idx = 0; score = 0; answers = [];
-    perRound = { "Albums":0, "Intros":0, "Year Released":0, "Band Members":0 };
-    status.textContent = "Ready!";
-    show("screen-quiz");
-    render();
-  }catch(err){
-    status.textContent = "Error fetching tracks. Check your internet and try again.";
-    console.error(err);
+    QUESTIONS=await buildQuestions(t=>prog.textContent=t);
+  }catch(e){
+    prog.textContent="Error fetching tracks. Check connection and try again."; console.error(e); return;
+  }finally{
+    overlay.classList.remove("active");
   }
+  // reset & go
+  idx=0; score=0; answers=[]; perRound={"Albums":0,"Intros":0,"Year Released":0,"Band Members":0};
+  document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
+  $("#screen-quiz").classList.add("active");
+  render();
 };
-
-$("#btnPrev").onclick = ()=>{ if(idx>0){ idx--; render(); } };
-$("#btnNext").onclick = ()=>{ if(idx<QUESTIONS.length-1){ idx++; render(); } else { finish(); } };
-$("#btnRestart").onclick = ()=>{ show("screen-start"); $("#fetchStatus").textContent=""; };
-$("#btnStartRounds").onclick = ()=>{ show("screen-start"); $("#fetchStatus").textContent=""; };
-
+$("#btnPrev").onclick=()=>{ if(idx>0){idx--;render();} };
+$("#btnNext").onclick=()=>{ if(idx<QUESTIONS.length-1){idx++;render();} else {finish();} };
+$("#btnRestart").onclick=()=>{ document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active")); $("#screen-start").classList.add("active"); $("#status").textContent=""; };
+$("#btnAgain").onclick=()=>{ $("#btnRestart").click(); };
 </script>
 </body>
 </html>
